@@ -1,0 +1,34 @@
+server:
+  contextPath: /V1
+  port: 5511
+
+spring:
+  redis:
+    host: redislocal
+    port: 6379
+
+logging:
+  file: ./logs/service.log
+  level:
+    root: info
+    br.com.sysmap: info
+    org.apache.camel: info
+  pattern:
+    file: "[%d{ISO8601}] %-5level %-40.40c{1.} : %m%ex%n"
+
+application:
+  path:
+    # API Swagger
+    api-doc: /api-doc
+    api-title: User API
+    api-version: 0.0.1-SNAPSHOT
+
+    # Custom REST services
+    business-interactions: /business-interactions
+    business-interactions-desc: Customer self empowered rest service to business interactions
+
+  third-party:
+    business-interactions-endpoint: http://localhost:8080
+
+  queues:
+    business-interactions-generate: rabbitmq://rabbitmqlocal:5673/adapter.business.interactions?username=guest&password=guest&queue=adapter.business.interactions.generate&exchangeType=direct&routingKey=search.v1&autoDelete=false&durable=true
