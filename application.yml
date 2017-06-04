@@ -20,7 +20,7 @@ application:
   path:
     # API Swagger
     api-doc: ${application.path.business-interactions}/api-doc
-    api-title: User API
+    api-title: Business Interactions API
     api-version: 0.0.1-SNAPSHOT
 
     # Custom REST services
