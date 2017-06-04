@@ -28,7 +28,7 @@ application:
     business-interactions-desc: Customer self empowered rest service to business interactions
 
   third-party:
-    business-interactions-endpoint: http://localhost:8080
+    business-interactions-endpoint: http://mock::8080/mockservice
 
   queues:
     business-interactions-generate: rabbitmq://rabbitmqlocal:5672/adapter.business.interactions?username=guest&password=guest&queue=adapter.business.interactions.generate&exchangeType=direct&routingKey=search.v1&autoDelete=false&durable=true
