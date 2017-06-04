@@ -11,6 +11,7 @@ import java.util.Map;
 import static javax.ws.rs.HttpMethod.*;
 import static org.apache.camel.Exchange.*;
 import static org.apache.camel.component.rabbitmq.RabbitMQConstants.DELIVERY_MODE;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.springframework.boot.autoconfigure.jms.JmsProperties.DeliveryMode.PERSISTENT;
 import static org.springframework.http.HttpStatus.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
@@ -30,7 +31,6 @@ public class InOutRouter extends RouteBuilder {
     public void configure() throws Exception {
 
         from("direct:business-interaction-generate")
-            .log("${headers}")
             .setHeader(DELIVERY_MODE, constant(PERSISTENT.getValue()))
             .setHeader(CUSTOM_HTTP_METHOD, header(HTTP_METHOD))
             .inOut(config.getQueues().getBusinessInteractionsGenerate()) // Send to rabbit using InOut exchange pattern
@@ -40,6 +40,10 @@ public class InOutRouter extends RouteBuilder {
                 .when(header(CUSTOM_HTTP_METHOD).isEqualTo(DELETE))
                     .to("bean:genBusinessInteraction?method=delete(${header.businessid})")
                 .when(header(CUSTOM_HTTP_METHOD).isEqualTo(POST))
+                    .process(exchange -> {
+                        if (isBlank(exchange.getIn().getBody(String.class)))
+                            exchange.getIn().setBody(null);
+                    })
                     .to("bean:genBusinessInteraction?method=generate")
                 .otherwise()
                     .setHeader(HTTP_RESPONSE_CODE, constant(BAD_REQUEST.value()))

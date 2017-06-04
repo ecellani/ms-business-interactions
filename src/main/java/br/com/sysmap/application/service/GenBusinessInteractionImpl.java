@@ -13,6 +13,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.concurrent.ExecutionException;
 
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
+
 /**
  * Created by ecellani on 04/06/17.
  */
@@ -28,6 +30,14 @@ public class GenBusinessInteractionImpl implements IGenBusinessInteraction {
 
     @Override
     public CustomResponse generate(ServiceRequestType serviceRequestType) {
+
+        if (serviceRequestType == null
+                || serviceRequestType.getId() == null
+                || serviceRequestType.getServiceId() == null
+                || serviceRequestType.getChannel() == null) {
+            ResponseError responseError = new ResponseError(BAD_REQUEST.name(), BAD_REQUEST.getReasonPhrase());
+            return new CustomResponse(false, responseError);
+        }
 
         ServiceRequestType cache = getCache(serviceRequestType);
         if (cache != null) {
