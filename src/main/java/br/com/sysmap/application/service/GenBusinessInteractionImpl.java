@@ -13,6 +13,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.concurrent.ExecutionException;
 
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
+
 /**
  * Created by ecellani on 04/06/17.
  */
@@ -28,6 +31,14 @@ public class GenBusinessInteractionImpl implements IGenBusinessInteraction {
 
     @Override
     public CustomResponse generate(ServiceRequestType serviceRequestType) {
+
+        if (serviceRequestType == null
+                || serviceRequestType.getId() == null
+                || serviceRequestType.getServiceId() == null
+                || serviceRequestType.getChannel() == null) {
+            ResponseError responseError = new ResponseError(BAD_REQUEST.name(), BAD_REQUEST.getReasonPhrase());
+            return new CustomResponse(false, responseError);
+        }
 
         ServiceRequestType cache = getCache(serviceRequestType);
         if (cache != null) {
@@ -58,16 +69,24 @@ public class GenBusinessInteractionImpl implements IGenBusinessInteraction {
         return customResponse;
     }
 
-    private ServiceRequestType getCache(ServiceRequestType serviceRequestType) {
-        try {
-            if (redisTemplate.hasKey(serviceRequestType.hashCode()+"")) {
-                log.info("Key {} has been found in cache", serviceRequestType.hashCode());
-                return redisTemplate.opsForValue().get(serviceRequestType.hashCode());
-            }
-        } catch (RedisConnectionFailureException e) {
-            log.warn("Cannot connect to Redis. The service is not available", e);
+    public CustomResponse get(String businessId) {
+        ServiceRequestType cache = getCache(businessId);
+        if (cache != null) {
+            return new CustomResponse(true, cache);
+        } else {
+            ResponseError responseError = new ResponseError(NOT_FOUND.name(), "Key not found");
+            return new CustomResponse(false, responseError);
         }
-        return null;
+    }
+
+    public CustomResponse delete(String businessId) {
+        ServiceRequestType cache = getCache(businessId);
+        if (cache == null) {
+            ResponseError responseError = new ResponseError(NOT_FOUND.name(), "Key not found");
+            return new CustomResponse(false, responseError);
+        }
+        deleteCache(cache);
+        return new CustomResponse(true);
     }
 
     private void saveCache(ServiceRequestType serviceRequestType) {
@@ -78,6 +97,27 @@ public class GenBusinessInteractionImpl implements IGenBusinessInteraction {
         } catch (RedisConnectionFailureException e) {
             log.warn("Cannot connect to Redis. The service is not available", e);
         }
+    }
+
+    private ServiceRequestType getCache(ServiceRequestType serviceRequestType) {
+        return getCache(serviceRequestType.hashCode()+"");
+    }
+
+    private ServiceRequestType getCache(String key) {
+        try {
+            if (redisTemplate.hasKey(key)) {
+                log.info("Key {} has been found in cache", key);
+                return redisTemplate.opsForValue().get(key);
+            }
+        } catch (RedisConnectionFailureException e) {
+            log.warn("Cannot connect to Redis. The service is not available", e);
+        }
+        return null;
+    }
+
+    private void deleteCache(ServiceRequestType serviceRequestType) {
+        redisTemplate.delete(serviceRequestType.hashCode()+"");
+        redisTemplate.delete(serviceRequestType.getBusinessId());
     }
 
     private Object generateBusinessInteractionWS(ServiceRequestType serviceRequestType) throws ExecutionException, InterruptedException {
