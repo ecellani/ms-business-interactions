@@ -3,7 +3,7 @@
     "name": "ms-business-interactions",
     "port": 5511,
     "check": {
-      "http": "http://localhost:5511/V1/business-interactions/api-doc",
+      "http": "http://localhost:5511/v1/business-interactions/api-doc",
       "interval": "10s"
     }
   }
