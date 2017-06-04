@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import static org.apache.camel.model.rest.RestBindingMode.json;
+import static org.apache.camel.model.rest.RestParamType.path;
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
 
@@ -42,6 +43,14 @@ public class GenBusinessInteractionRouter extends RouteBuilder {
                 .code(OK.value())
                 .message("Custom Response with the business interaction ID")
             .endResponseMessage()
+            .to("direct:business-interaction-generate")
+
+        .get("/{businessid}").description("Get the service request type")
+            .param().name("businessid").type(path).dataType("string").description("The business id").required(true).endParam()
+            .to("direct:business-interaction-generate")
+
+        .delete("/{businessid}").description("Remove the service request type")
+            .param().name("businessid").type(path).dataType("string").description("The business id").required(true).endParam()
             .to("direct:business-interaction-generate")
         ;
    }

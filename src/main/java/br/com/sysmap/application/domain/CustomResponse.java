@@ -40,6 +40,10 @@ public class CustomResponse implements Serializable {
         this(success, null, error);
     }
 
+    public CustomResponse(Boolean success) {
+        this(success, null, null);
+    }
+
     public String toJson() {
         try {
             return new ObjectMapper().writeValueAsString(this);
