@@ -24,14 +24,16 @@ public class GenBusinessInteractionImpl implements IGenBusinessInteraction {
     private ProducerTemplate template;
 
     @Autowired
-    private RedisTemplate<Integer, ServiceRequestType> redisTemplate;
+    private RedisTemplate<String, ServiceRequestType> redisTemplate;
 
     @Override
     public CustomResponse generate(ServiceRequestType serviceRequestType) {
 
         ServiceRequestType cache = getCache(serviceRequestType);
-        if (cache != null)
-            return new CustomResponse(true, cache);
+        if (cache != null) {
+            ResponseError responseError = new ResponseError("BUSINESS_ERROR", "Already exists");
+            return new CustomResponse(false, responseError);
+        }
 
         CustomResponse customResponse;
         try {
@@ -58,22 +60,23 @@ public class GenBusinessInteractionImpl implements IGenBusinessInteraction {
 
     private ServiceRequestType getCache(ServiceRequestType serviceRequestType) {
         try {
-            if (redisTemplate.hasKey(serviceRequestType.hashCode())) {
+            if (redisTemplate.hasKey(serviceRequestType.hashCode()+"")) {
                 log.info("Key {} has been found in cache", serviceRequestType.hashCode());
                 return redisTemplate.opsForValue().get(serviceRequestType.hashCode());
             }
         } catch (RedisConnectionFailureException e) {
-            log.warn("Cannot connect to Redis. The service is not available"/*, e*/);
+            log.warn("Cannot connect to Redis. The service is not available", e);
         }
         return null;
     }
 
     private void saveCache(ServiceRequestType serviceRequestType) {
         try {
-            redisTemplate.opsForValue().set(serviceRequestType.hashCode(), serviceRequestType);
+            redisTemplate.opsForValue().set(serviceRequestType.hashCode()+"", serviceRequestType);
+            redisTemplate.opsForValue().set(serviceRequestType.getBusinessId(), serviceRequestType);
             log.info("Key {} has been added to cache", serviceRequestType.hashCode());
         } catch (RedisConnectionFailureException e) {
-            log.warn("Cannot connect to Redis. The service is not available"/*, e*/);
+            log.warn("Cannot connect to Redis. The service is not available", e);
         }
     }
 

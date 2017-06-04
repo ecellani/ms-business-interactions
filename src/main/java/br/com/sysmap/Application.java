@@ -40,8 +40,8 @@ public class Application {
     }
 
     @Bean
-    public RedisTemplate<Integer, ServiceRequestType> redisTemplate() {
-        RedisTemplate<Integer, ServiceRequestType> redisTemplate = new RedisTemplate<>();
+    public RedisTemplate<String, ServiceRequestType> redisTemplate() {
+        RedisTemplate<String, ServiceRequestType> redisTemplate = new RedisTemplate<>();
         redisTemplate.setConnectionFactory(jedisConnectionFactory());
         return redisTemplate;
     }

@@ -36,8 +36,12 @@ public class InOutRouter extends RouteBuilder {
                 int responseStatus = OK.value();
                 CustomResponse customResponse = exchange.getIn().getBody(CustomResponse.class);
 
-                if (customResponse.getError() != null)
-                    responseStatus = INTERNAL_SERVER_ERROR.value();
+                if (customResponse.getError() != null) {
+                    if ("BUSINESS_ERROR".equals(customResponse.getError().getResponseStatus()))
+                        responseStatus = BAD_REQUEST.value();
+                    else
+                        responseStatus = INTERNAL_SERVER_ERROR.value();
+                }
 
                 if (customResponse.getSuccess()
                         && customResponse.getPayload() == null)
