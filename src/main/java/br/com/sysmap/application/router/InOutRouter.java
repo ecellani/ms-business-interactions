@@ -55,6 +55,8 @@ public class InOutRouter extends RouteBuilder {
                 if (customResponse.getError() != null) {
                     if ("BUSINESS_ERROR".equals(customResponse.getError().getResponseStatus()))
                         responseStatus = BAD_REQUEST.value();
+                    else if (NOT_FOUND.name().equals(customResponse.getError().getResponseStatus()))
+                        responseStatus = NOT_FOUND.value();
                     else
                         responseStatus = INTERNAL_SERVER_ERROR.value();
                 }

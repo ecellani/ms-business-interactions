@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import java.util.concurrent.ExecutionException;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 /**
  * Created by ecellani on 04/06/17.
@@ -73,7 +74,7 @@ public class GenBusinessInteractionImpl implements IGenBusinessInteraction {
         if (cache != null) {
             return new CustomResponse(true, cache);
         } else {
-            ResponseError responseError = new ResponseError("NOT_FOUND", "Key not found");
+            ResponseError responseError = new ResponseError(NOT_FOUND.name(), "Key not found");
             return new CustomResponse(false, responseError);
         }
     }
@@ -81,7 +82,7 @@ public class GenBusinessInteractionImpl implements IGenBusinessInteraction {
     public CustomResponse delete(String businessId) {
         ServiceRequestType cache = getCache(businessId);
         if (cache == null) {
-            ResponseError responseError = new ResponseError("NOT_FOUND", "Key not found");
+            ResponseError responseError = new ResponseError(NOT_FOUND.name(), "Key not found");
             return new CustomResponse(false, responseError);
         }
         deleteCache(cache);
