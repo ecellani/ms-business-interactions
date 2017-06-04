@@ -9,8 +9,7 @@ import org.springframework.stereotype.Component;
 
 import static org.apache.camel.model.rest.RestBindingMode.json;
 import static org.apache.camel.model.rest.RestParamType.path;
-import static org.springframework.http.HttpStatus.NOT_FOUND;
-import static org.springframework.http.HttpStatus.OK;
+import static org.springframework.http.HttpStatus.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
 
 /**
@@ -54,6 +53,16 @@ public class GenBusinessInteractionRouter extends RouteBuilder {
             .responseMessage().code(OK.value()).message("Service response type deleted").endResponseMessage()
             .responseMessage().code(NOT_FOUND.value()).message("Service request type not found").endResponseMessage()
             .to("direct:business-interaction-generate")
+
+        .patch("/{businessid}").description("Update body fields")
+            .param().name("businessid").type(path).dataType("string").description("The business id").required(true).endParam()
+            .responseMessage().code(NOT_IMPLEMENTED.value()).message(NOT_IMPLEMENTED.getReasonPhrase()).endResponseMessage()
+            .to("direct:not-implemented")
+
+        .put("/{businessid}").description("Update entire service request type supplied in body")
+            .param().name("businessid").type(path).dataType("string").description("The business id").required(true).endParam()
+            .responseMessage().code(NOT_IMPLEMENTED.value()).message(NOT_IMPLEMENTED.getReasonPhrase()).endResponseMessage()
+            .to("direct:not-implemented")
         ;
    }
 }

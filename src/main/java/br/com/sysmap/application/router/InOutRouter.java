@@ -47,6 +47,7 @@ public class InOutRouter extends RouteBuilder {
                     .to("bean:genBusinessInteraction?method=generate")
                 .otherwise()
                     .setHeader(HTTP_RESPONSE_CODE, constant(BAD_REQUEST.value()))
+                .end()
             .setHeader(CONTENT_TYPE, constant(APPLICATION_JSON_UTF8_VALUE))
             .process(exchange -> {
                 int responseStatus = OK.value();
@@ -75,8 +76,7 @@ public class InOutRouter extends RouteBuilder {
         .end();
 
         // Rabbit reply
-        from(config.getQueues().getBusinessInteractionsGenerate())
-            .removeHeaders("CamelHttp*")
-        .end();
+        from(config.getQueues().getBusinessInteractionsGenerate()).removeHeaders("CamelHttp*").end();
+        from("direct:not-implemented").setHeader(HTTP_RESPONSE_CODE, constant(NOT_IMPLEMENTED.value())).end();
     }
 }
