@@ -49,7 +49,7 @@ public class IntegrationRouter extends RouteBuilder {
                     } else if (ex instanceof TypeConversionException) {
                         exchange.getIn().setBody(new ResponseError("FATAL_ERROR", "Ocorreu um erro ao chamar o CustomerSelfEmpowered"));
                     } else {
-                        exchange.getIn().setBody(new ResponseError("FATAL_ERROR", ex.getMessage()));
+                        exchange.getIn().setBody(new ResponseError("FATAL_ERROR", "Ocorreu um erro inesperado"));
                     }
                 })
             .end()
